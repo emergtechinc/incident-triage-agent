@@ -27,6 +27,12 @@ that is the starting line.
 (`src/triage/fake.py`), so the whole suite runs offline and CI costs nothing. That is not a
 shortcut; it is how you test anything with a non-deterministic dependency.
 
+## Before your first ticket
+
+**[PRIMER.md](PRIMER.md)** — what a request and a response actually look like, and how to read a
+failing test as your specification. Ten minutes, and it covers everything four of the seven tickets
+need. The other three need nothing beyond ordinary Python.
+
 ## Take a ticket
 
 Open [Issues](../../issues), find one nobody has taken, **assign it to yourself**.
