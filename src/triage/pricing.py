@@ -27,7 +27,13 @@ def cost_usd(model: str, input_tokens: int, output_tokens: int) -> float:
     Raise KeyError with a helpful message for an unknown model -- a typo in a
     model id must not silently price as something else.
     """
-    raise NotImplementedError("TICKET 1: see tests/test_pricing.py")
+    if model not in RATES:
+        raise KeyError(f"Unknown model: {model}")
+    rate= RATES[model]
+    input_cost=(input_tokens / 1000000)* rate["in"]
+    output_cost=(output_tokens / 1000000)* rate["out"]
+    return input_cost + output_cost
+    """raise NotImplementedError("TICKET 1: see tests/test_pricing.py")"""
 
 
 def cost_of_response(model: str, usage) -> float:
@@ -37,4 +43,9 @@ def cost_of_response(model: str, usage) -> float:
     rather than estimating -- the model decides how much output to generate, so
     the reported figure is the only honest one.
     """
-    raise NotImplementedError("TICKET 1: see tests/test_pricing.py")
+    return cost_usd(
+        model,
+        usage.input_tokens,
+        usage.output_tokens,
+    )
+    """raise NotImplementedError("TICKET 1: see tests/test_pricing.py")"""
