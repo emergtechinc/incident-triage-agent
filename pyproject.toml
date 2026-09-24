@@ -1,0 +1,14 @@
+[project]
+name = "incident-triage-agent"
+version = "0.1.0"
+description = "A bounded agentic loop that triages production incidents."
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+live = ["anthropic>=1.0"]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
