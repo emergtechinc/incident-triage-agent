@@ -8,18 +8,20 @@ every ticket is independent, and the scaffold that would block you is already do
 
 ---
 
-## Get set up (5 minutes)
+## Get set up
+
+**Full instructions, all platforms: [SETUP.md](SETUP.md).** The short version:
 
 ```bash
 git clone https://github.com/emergtechinc/incident-triage-agent.git
 cd incident-triage-agent
-
-python3 -m venv .venv          # name an explicit python3.10+ if `python3` is version-managed
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
+python3 -m venv .venv && source .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install pytest
-
-pytest tests/ -q               # expect: lots of failures. That is the starting line.
+python check_env.py
 ```
+
+`check_env.py` verifies everything and tells you what to fix if not. Expect **41 failing tests** —
+that is the starting line.
 
 **No API key is needed — for any of it.** Every test drives a scripted fake client
 (`src/triage/fake.py`), so the whole suite runs offline and CI costs nothing. That is not a
