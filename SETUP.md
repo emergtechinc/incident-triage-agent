@@ -1,7 +1,8 @@
 # Setup — 10 minutes
 
-**You do not need an Anthropic account or an API key for any of this project.** Every test runs
-offline against a scripted stand-in for the API. Keys come later, for the live demos.
+**You do not need an API key for any ticket in this project.** Every test runs offline against a
+scripted stand-in for the API. You will be given a key for the live demos in the curriculum repo —
+see [Your Anthropic API key](#your-anthropic-api-key) below when you get it.
 
 ---
 
@@ -106,6 +107,69 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 ```
 
 Forgetting this causes most "it worked yesterday" reports.
+
+---
+
+## Your Anthropic API key
+
+**Not needed for any ticket in this project.** Every test here runs offline. This section is for the
+demos in the curriculum repo, where you call the real API.
+
+You will be given a key. It looks like `sk-ant-...` and it is a password — treat it like one.
+
+### Set it for your current terminal
+
+**macOS / Linux**
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+**Windows (PowerShell)**
+
+```powershell
+$env:ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+Check it took, without printing it:
+
+```bash
+echo "key set: ${ANTHROPIC_API_KEY:+yes}"        # macOS / Linux
+```
+```powershell
+if ($env:ANTHROPIC_API_KEY) { "key set: yes" }   # Windows
+```
+
+### Make it permanent
+
+That export lasts for one terminal window. To set it once and forget it:
+
+**macOS / Linux** — add the `export` line to `~/.zshrc` (or `~/.bashrc`), then `source ~/.zshrc`.
+
+**Windows** — `setx ANTHROPIC_API_KEY "sk-ant-..."` in PowerShell, then **open a new terminal**
+(`setx` does not affect the window you run it in).
+
+### In a Colab notebook
+
+Click the 🔑 in the left sidebar → **Add new secret** → name it exactly `ANTHROPIC_API_KEY` → paste
+the value → switch on **Notebook access**. Done once, every notebook picks it up, and the key never
+becomes part of the saved notebook.
+
+### What you do NOT need
+
+- **No `ANTHROPIC_BASE_URL`.** That is only for a proxy. With your own key the SDK talks to Anthropic
+  directly.
+- **No key in your code.** `anthropic.Anthropic()` reads the environment by itself.
+
+### Four rules
+
+1. **Never commit it.** `.env` is gitignored. If one ever lands in a commit, say so immediately —
+   revoking takes thirty seconds and there is no version of this where hiding it is better.
+2. **Never paste it in chat**, including the group.
+3. **Never type it while screen sharing.**
+4. **Your key has a spend cap and it is shared with everyone else on the cohort.** A runaway loop
+   burns the pool, not just your share. That is not a warning — it is the reason the project you are
+   building has a cost ceiling in it.
 
 ---
 
