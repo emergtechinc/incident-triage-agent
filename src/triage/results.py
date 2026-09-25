@@ -22,12 +22,18 @@ def tool_result(tool_use_id: str, content: str, *, is_error: bool = False) -> di
     plus "is_error": True when the tool failed. Report failures honestly --
     told the truth, the model will usually work around it.
     """
-    raise NotImplementedError("TICKET 4: see tests/test_results.py")
+    block = {"type": "tool_result", "tool_use_id": tool_use_id, "content": content,  "is_error": is_error,}
+    if is_error:
+        block[is_error] = True 
+    return block
+
+   
+    
 
 
 def results_message(results: list[dict]) -> dict:
-    """Wrap ALL tool results into a SINGLE user message.
-
-    Shape: {"role": "user", "content": [ ...every result... ]}
-    """
-    raise NotImplementedError("TICKET 4: see tests/test_results.py")
+    """Wrap ALL tool results into a SINGLE user message."""
+    return {
+        "role": "user",
+        "content": results,
+    }
