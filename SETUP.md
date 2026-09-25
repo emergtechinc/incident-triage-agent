@@ -161,7 +161,40 @@ becomes part of the saved notebook.
   directly.
 - **No key in your code.** `anthropic.Anthropic()` reads the environment by itself.
 
+### Using the key with Claude Code (in VS Code or the terminal)
+
+**It works** — if `ANTHROPIC_API_KEY` is set, Claude Code prompts you once to approve that key
+instead of opening a browser sign-in. The VS Code extension behaves the same way.
+
+> **Do not use your cohort key for this.**
+>
+> The cohort spend cap is sized for the lesson steps — a handful of API calls each, cents per person.
+> Claude Code is a different order of magnitude: it reads your files, loops over tool calls, and
+> spends on every turn of every session. A few people using it for an afternoon can drain the shared
+> pool, and then nobody can run a demo.
+>
+> **Your cohort key is for the lesson steps and the notebook. That is all.**
+
+If you want Claude Code for your own work, use one of:
+
+- **A Claude Pro or Max subscription** — flat monthly, no per-token billing. Sign in through the
+  browser and leave `ANTHROPIC_API_KEY` unset.
+- **Your own Console account and your own key**, with your own spend limit. Separate from the cohort
+  pool entirely.
+
+If you already have `ANTHROPIC_API_KEY` exported and want Claude Code to use your *subscription*
+instead, unset it first — otherwise Claude Code offers the key and bills per token:
+
+```bash
+unset ANTHROPIC_API_KEY          # macOS / Linux
+```
+```powershell
+Remove-Item Env:ANTHROPIC_API_KEY    # Windows PowerShell
+```
+
 ### Four rules
+
+
 
 1. **Never commit it.** `.env` is gitignored. If one ever lands in a commit, say so immediately —
    revoking takes thirty seconds and there is no version of this where hiding it is better.
