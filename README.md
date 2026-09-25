@@ -35,6 +35,9 @@ need. The other three need nothing beyond ordinary Python.
 
 ## Take a ticket
 
+> **Working in VS Code? [VSCODE.md](VSCODE.md) walks the whole thing** — clone, venv, selecting the
+> interpreter (the step people skip), running one test, branch, commit, pull request.
+
 Open [Issues](../../issues), find one nobody has taken, **assign it to yourself**.
 
 ```bash
