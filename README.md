@@ -35,8 +35,8 @@ need. The other three need nothing beyond ordinary Python.
 
 ## Take a ticket
 
-> **Working in VS Code? [VSCODE.md](VSCODE.md) walks the whole thing** — clone, venv, selecting the
-> interpreter (the step people skip), running one test, branch, commit, pull request.
+> **[SETUP.md](SETUP.md)** covers the whole thing — clone, venv, pointing VS Code at the right
+> interpreter (the step people skip), then the ticket loop: branch, test, commit, pull request.
 
 Open [Issues](../../issues), find one nobody has taken, **assign it to yourself**.
 

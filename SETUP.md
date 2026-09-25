@@ -1,27 +1,25 @@
-# Setup — 10 minutes
+# Setup and workflow
 
-**You do not need an API key for any ticket in this project.** Every test runs offline against a
-scripted stand-in for the API. You will be given a key for the live demos in the curriculum repo —
-see [Your Anthropic API key](#your-anthropic-api-key) below when you get it.
+Everything from a fresh machine to your first merged pull request. **10 minutes to set up**, then
+the ticket loop at the end is the same five minutes every time.
+
+**You do not need an API key for any ticket.** Every test runs offline. Keys are for the live demos
+in the curriculum repo — see [Your Anthropic API key](#your-anthropic-api-key) when you get one.
 
 ---
 
 ## 1. Python 3.10 or newer
-
-Check what you have:
 
 ```bash
 python3 --version        # macOS / Linux
 python --version         # Windows
 ```
 
-**3.10 or newer.** If it's older or the command isn't found:
-
 | | |
 |---|---|
-| **macOS** | `brew install python@3.12` — or download from [python.org](https://www.python.org/downloads/). Note `/usr/bin/python3` is the system Python and is usually 3.9, too old. |
+| **macOS** | `brew install python@3.12`, or [python.org](https://www.python.org/downloads/). Note `/usr/bin/python3` is the system Python and is usually 3.9 — too old. |
 | **Windows** | [python.org](https://www.python.org/downloads/) — **tick "Add python.exe to PATH"** on the first screen. |
-| **Linux** | `sudo apt install python3 python3-venv` (Debian/Ubuntu) |
+| **Linux** | `sudo apt install python3 python3-venv` |
 
 ## 2. Git
 
@@ -31,15 +29,23 @@ git --version
 
 Missing? [git-scm.com/downloads](https://git-scm.com/downloads), or `brew install git`.
 
-## 3. Get the code and build an environment
+## 3. Get the code and open it
 
 ```bash
+mkdir -p ~/Documents/workspace/tvi && cd ~/Documents/workspace/tvi
 git clone https://github.com/emergtechinc/incident-triage-agent.git
 cd incident-triage-agent
+code .                        # opens the folder in VS Code
 ```
 
-**macOS / Linux**
+Any folder works — use your own if you already keep projects elsewhere. If `code .` isn't found:
+**File → Open Folder**.
 
+## 4. Build the virtual environment
+
+In VS Code's terminal (**Terminal → New Terminal**, or `` Ctrl+` ``), **from the project root**:
+
+**macOS / Linux**
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -47,66 +53,140 @@ pip install pytest
 ```
 
 **Windows (PowerShell)**
-
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install pytest
 ```
 
+Your prompt now starts with `(.venv)`. **That's how you know it worked.**
+
 > If PowerShell blocks the activate script, run once:
 > `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
 
-Your prompt now starts with `(.venv)`. **That's how you know it worked.**
-
 ### Two rules that prevent the one painful failure
 
-**Never create a venv while another one is active.** If your prompt already shows a `(something)`
+**Never create a venv while another is active.** If your prompt already shows a `(something)`
 prefix, run `deactivate` first.
 
-**If your `python3` is managed by pyenv, asdf, conda or similar, name the interpreter explicitly:**
+**If your `python3` is managed by pyenv, conda or asdf, name the interpreter explicitly:**
 
 ```bash
-/opt/homebrew/bin/python3.12 -m venv .venv      # example — use a real path on your machine
+/opt/homebrew/bin/python3.12 -m venv .venv      # example — a real path on your machine
 ```
 
 Those tools resolve `python3` at the moment you call it, which can produce a venv where `pip` and
 `python` serve *different* Python versions. Packages then install successfully and fail to import,
 and nothing tells you why.
 
-## 4. Check it
+## 5. Point VS Code at that interpreter
+
+**The step people skip, and then nothing works.** VS Code keeps its own interpreter setting,
+separate from your terminal.
+
+1. `Cmd+Shift+P` (macOS) / `Ctrl+Shift+P` (Windows, Linux)
+2. Type **Python: Select Interpreter**
+3. Choose the one showing **`.venv`**, inside your project folder
+
+Bottom-right of the window should now read something like `Python 3.12.x ('.venv')`.
+
+Skip this and the editor shows import errors on code that runs perfectly in the terminal.
+
+## 6. Check it
 
 ```bash
 python check_env.py
 ```
 
-Expected:
+All `ok`, ending with `Test suite runs — 45 failed, 8 passed`.
 
-```
-[  ok  ] Python — 3.12
-[  ok  ] Virtual environment — .../incident-triage-agent/.venv
-[  ok  ] Interpreter is inside it
-[  ok  ] One site-packages tree
-[  ok  ] pytest — 9.x
-[  ok  ] Test suite runs — 41 failed, 2 passed
-```
+**Those failures are correct.** Nothing is implemented yet — that's the starting line, and your
+ticket is to turn some of them green. Anything marked `FAIL` prints its own fix.
 
-**41 failures is correct.** Nothing is implemented yet — that's the starting line, and your ticket is
-to turn some of them green.
+## 7. Every new terminal
 
-If anything says `FAIL`, it prints the fix. Run this first whenever something is strange; it's faster
-than reading a stack trace.
-
-## 5. Every new terminal
-
-The venv is per-terminal. Each time you open a new one:
+The venv is per-terminal:
 
 ```bash
-cd incident-triage-agent
+cd ~/Documents/workspace/tvi/incident-triage-agent
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 ```
 
 Forgetting this causes most "it worked yesterday" reports.
+
+---
+
+# Doing a ticket
+
+Claim one on [Issues](../../issues) — assign it to yourself. Then:
+
+## 1. Branch, and push it straight away
+
+```bash
+git checkout -b ticket-3-bounds        # your ticket number and name
+git push -u origin ticket-3-bounds
+```
+
+Push it even empty. It puts your work on the board, and a branch that exists is much easier to
+continue than one you still have to start.
+
+## 2. Read your tests before you write anything
+
+Your ticket names a test file. **Open it first — it is a more precise specification than the ticket.**
+
+```bash
+pytest tests/test_bounds.py -v
+```
+
+Read a test name as a sentence. Read its assertion — that's the exact shape expected. Read the
+comment above it — that's usually *why* the case matters.
+
+## 3. Write the code, one test at a time
+
+Open your module, e.g. `src/triage/bounds.py`. Its docstring says what it's for.
+
+**Delete** the `raise NotImplementedError(...)` line — don't comment it out.
+
+```bash
+pytest tests/test_bounds.py::test_turn_cap_trips_and_names_itself -v   # one test
+pytest tests/test_bounds.py -v                                          # the file
+```
+
+> VS Code's **Testing** panel (flask icon, left bar) shows the same thing with a tick per test and
+> lets you run one by clicking it. Use whichever you prefer.
+
+**Using AI to write it is expected** — but use your own, not the cohort key (see the key section
+below for why), and be ready to explain your code in review. "The AI wrote it" isn't an answer.
+
+## 4. Commit and push
+
+```bash
+git add src/triage/bounds.py
+git commit -m "bounds: stop before spending, not after"
+git push
+```
+
+Or VS Code's **Source Control** panel: type a message, **✓ Commit**, **Sync Changes**.
+
+Say *what changed and why*. `bounds: stop before spending, not after` beats `updated bounds.py`.
+
+## 5. Open the pull request
+
+```bash
+gh pr create --fill
+```
+
+Or use the **Compare & pull request** button GitHub shows after a push.
+
+Add `Closes #3` so the issue closes on merge. In the description say what you did and anything you
+were unsure about — *"I wasn't sure whether X"* is the most useful line in a pull request.
+
+## 6. Then two things happen
+
+**CI runs your tests** — green tick or red cross on the PR.
+**Someone reviews it** — one approval from a person who didn't write it, then it merges.
+
+And you review someone else's before you take another ticket.
 
 ---
 
@@ -239,10 +319,23 @@ export NVM_DIR="$HOME/.nvm"
 
 ---
 
+---
+
+## If something breaks
+
+| Symptom | Cause |
+|---|---|
+| `ModuleNotFoundError: triage` | Not in the project root, or the venv isn't active. |
+| `pytest: command not found` | `pip install pytest` with the venv active. |
+| VS Code shows import errors, terminal is fine | Step 5 — select the `.venv` interpreter. |
+| `(.venv)` gone from the prompt | New terminal. Activate again. |
+| Multiple site-packages / installs "vanish" | The venv is broken. `check_env.py` names it; rebuild per its instructions. |
+| Tests pass locally, CI fails | You didn't push, or you edited a test. Read what CI says. |
+| `command not found: nvm` | It's a shell function, not a program. `command -v nvm`, and reopen the terminal. |
+
+Stuck more than 30 minutes? **Comment on your issue** with what you tried. That's not failure —
+it's how teams work, and someone has usually hit the same wall.
+
 ## Then
 
-Pick a ticket from [Issues](../../issues), assign it to yourself, and read
-[README.md](README.md) for the branch-and-pull-request flow.
-
-Stuck for more than 30 minutes? Say so on the issue, with what you tried. That's not failure —
-it's how teams work.
+Pick a ticket from [Issues](../../issues) and read [README.md](README.md) for how we work.
