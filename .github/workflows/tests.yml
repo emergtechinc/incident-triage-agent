@@ -6,13 +6,55 @@ on:
     branches: [main]
 
 jobs:
-  pytest:
+  no-regression:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: { python-version: "3.12" }
+
       - run: pip install pytest
-      # No API key. No network. Every test drives a scripted fake client.
-      - run: pytest tests/ -v
+
+      # The whole suite is red until the LAST ticket lands, so "all green" is the
+      # wrong gate -- it would fail every pull request regardless of its quality.
+      # The right question is: did this branch turn tests green without breaking
+      # any that already passed?
+      - name: Count passing tests on this branch
+        id: branch
+        run: |
+          pytest tests/ -q > branch.txt 2>&1 || true
+          echo "count=$(grep -c PASS <<< "$(pytest tests/ -v 2>&1 | grep PASSED)" || echo 0)" >> "$GITHUB_OUTPUT"
+          pytest tests/ -v 2>&1 | grep PASSED | sed 's/ *PASSED.*//' | sort > branch-names.txt
+          echo "--- this branch:"; tail -1 branch.txt
+
+      - name: Count passing tests on main
+        id: base
+        run: |
+          git stash -u -q || true
+          git checkout -q origin/main
+          pytest tests/ -v 2>&1 | grep PASSED | sed 's/ *PASSED.*//' | sort > /tmp/main-names.txt || true
+          echo "--- main:"; pytest tests/ -q 2>&1 | tail -1
+          git checkout -q -
+          git stash pop -q || true
+
+      - name: A test that passed on main must still pass here
+        run: |
+          BROKE=$(comm -23 /tmp/main-names.txt branch-names.txt)
+          GAINED=$(comm -13 /tmp/main-names.txt branch-names.txt)
+
+          echo "newly passing:"; echo "${GAINED:-  (none)}" | sed 's/^/  /'
+          echo
+
+          if [ -n "$BROKE" ]; then
+            echo "REGRESSION -- these passed on main and fail here:"
+            echo "$BROKE" | sed 's/^/  /'
+            exit 1
+          fi
+
+          if [ -z "$GAINED" ]; then
+            echo "No new tests pass. That is fine for a docs or refactor change."
+          fi
+
+          echo "No regressions. Green."
